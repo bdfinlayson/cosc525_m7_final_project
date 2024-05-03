@@ -2,6 +2,8 @@
 .idea
 poetry.lock
 tuning
-data
+data/*.csv
+data/*/*.csv
+data/*.mat
 images
 */__pycache__/*
