@@ -46,4 +46,7 @@ klass_mappings = {
     45: "۹",
     46: "chahar",
     47: "shesh",
+    48: ''
 }
+
+#%%
