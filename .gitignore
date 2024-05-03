@@ -5,5 +5,4 @@ tuning
 data/*.csv
 data/*/*.csv
 data/*.mat
-images
 */__pycache__/*
