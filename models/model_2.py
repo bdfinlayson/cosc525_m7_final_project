@@ -13,55 +13,39 @@ class Model2(kt.HyperModel):
     def build(self, hp):
         try:
             model = tf.keras.Sequential()
-
-            # Input layer
             model.add(tf.keras.layers.Input(shape=self.input_shape))
-
             # Data augmentation layers
-            # Rotates image about 5.4 (1.5% * 360) degrees in either direction
-            model.add(tf.keras.layers.RandomRotation(0.015))
-
-            # Reshape layer as before
+            # Rotates image by ([factor] * 360) degrees in either direction
+            # Model is extremely sensitive to rotation and larger values confuse it
+            model.add(tf.keras.layers.RandomRotation(factor=hp.Choice('factor', [0.001, 0.0001])))
             model.add(tf.keras.layers.Reshape(self.desired_shape))
-
             # Conv2D layer with L1/L2 regularization
             model.add(tf.keras.layers.Conv2D(
-                filters=hp.Choice('conv_2_filter', values=[16, 32]),
+                filters=hp.Choice('conv_2_filter', values=[20, 30]),
                 kernel_size=hp.Choice('conv_2_kernel', values=[2, 4]),
                 activation=hp.Choice('activation', ['relu']),
                 kernel_regularizer=l1_l2(l1=hp.Choice('l1', [0.01, 0.1]), l2=hp.Choice('l2', [0.01, 0.1]))
             ))
-
-            # MaxPooling layer as before
             model.add(tf.keras.layers.MaxPooling2D(
                 pool_size=hp.Choice('pool_size', [2, 3]),
                 strides=hp.Choice('strides', [2, 3]),
                 padding='valid'
             ))
-
             model.add(tf.keras.layers.Dropout(rate=hp.Choice("dropout", [0.1, 0.25, 0.5])))
-
             # Conv2D layer with L1/L2 regularization
             model.add(tf.keras.layers.Conv2D(
-                filters=hp.Choice('conv_2_filter', values=[64, 128]),
+                filters=hp.Choice('conv_2_filter', values=[60, 120]),
                 kernel_size=hp.Choice('conv_2_kernel', values=[2, 4]),
                 activation=hp.Choice('activation', ['relu']),
                 kernel_regularizer=l1_l2(l1=hp.Choice('l1', [0.01, 0.1]), l2=hp.Choice('l2', [0.01, 0.1]))
             ))
-
-            # MaxPooling layer as before
             model.add(tf.keras.layers.MaxPooling2D(
                 pool_size=hp.Choice('pool_size', [2, 3]),
                 strides=hp.Choice('strides', [2, 3]),
                 padding='valid'
             ))
-
             model.add(tf.keras.layers.Dropout(rate=hp.Choice("dropout", [0.1, 0.25, 0.5])))
-
-            # Flatten layer as before
             model.add(tf.keras.layers.Flatten())
-
-            # Dense layer for classification
             model.add(tf.keras.layers.Dense(self.num_classes, activation="softmax"))
 
             # Compilation of the model
